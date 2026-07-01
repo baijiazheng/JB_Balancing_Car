@@ -4,6 +4,7 @@
 #include "Bluetooth.h"
 #include "Timer1.h"
 #include "HW_CONFIG.h"
+#include "Motor.h"
 
 
 // ================= 主系统入口 =================
@@ -12,7 +13,8 @@ void setup() {
     //Telemetry_CONFIG(); // [EN]Configure Bluetooth module/[CH]配置蓝牙模块
     Telemetry_Init();
     MPU6050_Init();
-    Timer1_Init();// [EN]Initialize Timer 1/[CH]初始化定时器 1
+    Timer1_Init();// [EN]Initialize Timer 1/[CH]初始化定时器 1 
+    Motor_Diagnostic_Test();
 }
 
 // ================== 主循环 ==================
