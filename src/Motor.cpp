@@ -44,5 +44,15 @@ void Set_Motor(int16_t speed_L, int16_t speed_R) {
 void Motor_Diagnostic_Test() {
     Set_Motor(100, 0);
     delay(3000);
-    Set_Motor(0, 0);
+    Set_Motor(0,100);
+    delay(3000);
+    Set_Motor(-100, 0);
+    delay(3000);
+    Set_Motor(0,-100);
+    delay(3000);
+    Set_Motor(100, 100);
+    delay(3000);
+    Set_Motor(-100, -100);
+    delay(3000);
+    Set_Motor(0,0);
 }
