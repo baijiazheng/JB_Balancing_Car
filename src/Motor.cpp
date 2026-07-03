@@ -43,16 +43,16 @@ void Set_Motor(int16_t speed_L, int16_t speed_R) {
 // [CN] 电机扫频压测函数 (开机执行一次)
 void Motor_Diagnostic_Test() {
     Set_Motor(100, 0);
-    delay(3000);
+    delay(300);
     Set_Motor(0,100);
-    delay(3000);
+    delay(300);
     Set_Motor(-100, 0);
-    delay(3000);
+    delay(300);
     Set_Motor(0,-100);
-    delay(3000);
+    delay(300);
     Set_Motor(100, 100);
-    delay(3000);
+    delay(300);
     Set_Motor(-100, -100);
-    delay(3000);
+    delay(300);
     Set_Motor(0,0);
 }

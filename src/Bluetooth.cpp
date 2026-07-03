@@ -29,7 +29,7 @@ void Telemetry_Send_100ms(float pitch, int16_t motor_pwm) {
         BT_SERIAL.print("P:");
         BT_SERIAL.print(pitch, 1); // 仅保留1位小数
         BT_SERIAL.print(",W:");
-        BT_SERIAL.println(motor_pwm); // println 自动携带 \r\n 换行符作为帧结束标志
+        BT_SERIAL.println(motor_pwm);
     }
 }
 

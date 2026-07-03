@@ -31,13 +31,21 @@ void loop() {
         // 2. [CN] 控制层：标准的直立 PD 计算
         int16_t motor_out = Upright_PD_Control(pitchAngle, gyroRateX);
 
+        // 3. [EN] Actuation: Output to motors
+        // 3. [CN] 执行层：输出到电机
+        if (abs(pitchAngle) > 45.0) {
+            Set_Motor(0, 0);
+            return; 
+        }
+        Set_Motor(-motor_out, -motor_out);
+
         // ================= 3. 降频遥测层 (时间片切分) =================
         Telemetry_Send_100ms(pitchAngle, motor_out);
     }
 
     // ================= 空闲时间：处理接收指令 =================
     char cmd = Telemetry_Receive_Cmd();
-    if (cmd != '\0') {
+    if (cmd != '\0') { 
         // 如果收到了字符，这里处理遥控逻辑
         // if (cmd == 'F') { target_angle = 3.0; }
     }
