@@ -25,10 +25,10 @@ int16_t Upright_PD_Control(float pitch, float gyro_rate) {
 
     // 4. [EN] Hardware Limit: Match Timer 3 TOP value (400)
     // 4. [CN] 物理限幅：必须匹配 Timer 3 寄存器设定的 TOP 值 (400)
-    if (final_pwm > 5) {
-        final_pwm = 5;
-    } else if (final_pwm < -5) {
-        final_pwm = -5;
+    if (final_pwm > 50) {
+        final_pwm = 50;
+    } else if (final_pwm < -50) {
+        final_pwm = -50;
     }
 
     return final_pwm;
