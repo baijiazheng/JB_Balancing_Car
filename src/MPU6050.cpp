@@ -1,6 +1,7 @@
 #include"MPU6050.h"
 #include<Wire.h>
 #include <math.h> // [EN] Need math library for atan2() / [CN] 需要数学库调用 atan2() 反三角函数
+#include "Bluetooth.h" // [EN] Include Bluetooth header for debugging / [CN] 包含蓝牙头文件用于调试输出
 
 //[EN]Actually define and allocate memory for these global variables
 //[CN]真正定义并分配内存给这些全局变量
@@ -54,6 +55,17 @@ void MPU6050_Read_RAW() {
     gyroX = Wire.read() << 8 | Wire.read();
     gyroY = Wire.read() << 8 | Wire.read();
     gyroZ = Wire.read() << 8 | Wire.read();
+    // BT_SERIAL.print("AX=");
+    // BT_SERIAL.print(accelX);
+
+    // BT_SERIAL.print(" AY=");
+    // BT_SERIAL.print(accelY);
+
+    // BT_SERIAL.print(" AZ=");
+    // BT_SERIAL.print(accelZ);
+
+    // BT_SERIAL.print(" GX=");
+    // BT_SERIAL.println(gyroX);
   }
 }
 

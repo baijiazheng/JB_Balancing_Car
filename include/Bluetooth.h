@@ -24,7 +24,7 @@ void Telemetry_Init();
 
 // [EN] Time-sliced transmission (Call this every 5ms, it will only send every 100ms)
 // [CN] 时间片发送函数 (在5ms中断中调用，但底层会自动降频到100ms发送一次)
-void Telemetry_Send_100ms(float pitch, int16_t motor_pwm);
+void Telemetry_Send_100ms(float pitch, float gyro_rate);
 
 // [EN] Check and parse incoming commands from phone
 // [CN] 检查并解析手机端发来的遥控指令

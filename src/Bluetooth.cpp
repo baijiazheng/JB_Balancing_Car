@@ -17,7 +17,7 @@ void Telemetry_Init() {
 // [EN] Core Essence: Downsampled Transmission (10Hz)
 // [CN] 核心本质：降频发送架构。将高频的控制循环与低频的通信循环物理剥离。
 // --------------------------------------------------------
-void Telemetry_Send_100ms(float pitch, int16_t motor_pwm) {
+void Telemetry_Send_100ms(float pitch, float gyro_rate) {
     tele_counter++;
     
     // 阈值 20 * 调用周期 5ms = 100ms 物理周期
@@ -28,8 +28,8 @@ void Telemetry_Send_100ms(float pitch, int16_t motor_pwm) {
         // 格式: P:1.2,W:0\n
         BT_SERIAL.print("P:");
         BT_SERIAL.print(pitch, 1); // 仅保留1位小数
-        BT_SERIAL.print(",W:");
-        BT_SERIAL.println(motor_pwm);
+        BT_SERIAL.print(",G:");
+        BT_SERIAL.println(gyro_rate, 1); // 仅保留1位小数
     }
 }
 
