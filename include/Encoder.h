@@ -1,0 +1,18 @@
+// [EN] Encoder Driver Layer (Interrupt Based)
+// [CN] 编码器驱动层 (基于硬件中断)
+
+#ifndef ENCODER_H
+#define ENCODER_H
+
+#include <Arduino.h>
+
+// [EN] Get the number of accumulated pulses since last read (and clear counter)
+// [CN] 获取自上次读取以来积累的脉冲数 (读取后自动清零)
+int16_t Get_Encoder_Speed_L();
+int16_t Get_Encoder_Speed_R();
+
+// [EN] Initialize external interrupts for encoders
+// [CN] 初始化编码器外部中断
+void Encoder_Init();
+
+#endif
