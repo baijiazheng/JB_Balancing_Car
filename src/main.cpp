@@ -14,6 +14,7 @@ void setup() {
     //Telemetry_CONFIG(); // [EN]Configure Bluetooth module/[CH]配置蓝牙模块
     Telemetry_Init();
     MPU6050_Init();
+    Encoder_Init();
     Timer1_Init();// [EN]Initialize Timer 1/[CH]初始化定时器 1 
     //Motor_Diagnostic_Test();
 }
@@ -44,8 +45,10 @@ void setup() {
             //Set_Motor(-motor_out, -motor_out);
 
             // ================= 3. 降频遥测层 (时间片切分) =================
-            Telemetry_Send_100ms(pitchAngle, gyroRateX);
-            //Telemetry_Send_100ms(speed_left, speed_right);
+            //Telemetry_Send_100ms(pitchAngle, gyroRateX);
+            int32_t encoder_count_L = Get_Encoder_Count_L();
+            int32_t encoder_count_R = Get_Encoder_Count_R();
+            Telemetry_Send_100ms(encoder_count_L, encoder_count_R);
         }
 
     // ================= 空闲时间：处理接收指令 =================

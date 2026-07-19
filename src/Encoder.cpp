@@ -3,6 +3,8 @@
 
 volatile int32_t encoder_count_L = 0;
 volatile int32_t encoder_count_R = 0;
+volatile int32_t count_L = 0;
+volatile int32_t count_R = 0;
 
 // --------------------------------------------------------
 // [EN] Interrupt Service Routines (ISR)
@@ -19,9 +21,9 @@ void ISR_Encoder_L() {
 
 void ISR_Encoder_R() {
     if (digitalRead(PIN_ENC_R_B) == LOW) {
-        encoder_count_R++; // 注意：由于电机是对称安装的，左右轮的极性可能相反，后续联调时可能需要把 ++ 和 -- 互换
+        encoder_count_R--; // 注意：由于电机是对称安装的，左右轮的极性可能相反，后续联调时可能需要把 ++ 和 -- 互换
     } else {
-        encoder_count_R--;
+        encoder_count_R++;
     }
 }
 
@@ -44,9 +46,9 @@ void Encoder_Init() {
 // --------------------------------------------------------
 int16_t Get_Encoder_Speed_L() {
     int16_t speed;
-    
-    // 🚨 陷阱 2: 原子操作 (Critical Section)
-    // [CN] 强行关闭全局中断。防止在我们复制 32 位数据的中途，突然来了一个脉冲把数据改了，导致数据撕裂 (Data Tearing)
+
+    // [CN] 强行关闭全局中断。防止在我们复制 32 位数据的中途，突然来了一个脉冲把数据改了，导致数据撕裂
+    // [EN] Critical Section: Disable interrupts to prevent data tearing when reading 32-bit encoder count
     noInterrupts(); 
     speed = encoder_count_L; // 提取速度 (5ms 内积累的脉冲数)
     encoder_count_L = 0;     // 计数器清零，为下一个 5ms 周期做准备
@@ -62,4 +64,22 @@ int16_t Get_Encoder_Speed_R() {
     encoder_count_R = 0;
     interrupts();
     return speed;
+}
+
+int32_t Get_Encoder_Count_L() {
+    
+    noInterrupts(); 
+    count_L += encoder_count_L;
+    encoder_count_L = 0; // Clear the encoder count after reading
+    interrupts();
+    return count_L;
+}
+
+int32_t Get_Encoder_Count_R() {
+
+    noInterrupts(); 
+    count_R += encoder_count_R;
+    encoder_count_R = 0; // Clear the encoder count after reading
+    interrupts();
+    return count_R;
 }
