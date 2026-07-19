@@ -8,9 +8,9 @@
 
 // [EN] Get the number of accumulated pulses since last read (and clear counter)
 // [CN] 获取自上次读取以来积累的脉冲数 (读取后自动清零)
-int16_t Get_Encoder_Speed_L();
-int16_t Get_Encoder_Speed_R();
-
+int32_t Get_Encoder_Speed_L();
+int32_t Get_Encoder_Speed_R();
+    
 // [EN] Get the total accumulated pulse count since system start (does not clear counter)
 // [CN] 获取自系统启动以来的总脉冲数 (不会清零)
 int32_t Get_Encoder_Count_L();

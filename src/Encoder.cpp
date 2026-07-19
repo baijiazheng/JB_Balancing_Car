@@ -3,6 +3,8 @@
 
 volatile int32_t encoder_count_L = 0;
 volatile int32_t encoder_count_R = 0;
+volatile int32_t encoder_delta_L = 0;
+volatile int32_t encoder_delta_R = 0;
 volatile int32_t count_L = 0;
 volatile int32_t count_R = 0;
 
@@ -14,16 +16,20 @@ void ISR_Encoder_L() {
     // 当 A 相发生上升沿时，读取 B 相的电平来判断方向
     if (digitalRead(PIN_ENC_L_B) == LOW) {
         encoder_count_L++;
+        encoder_delta_L++;
     } else {
         encoder_count_L--;
+        encoder_delta_L--;
     }
 }
 
 void ISR_Encoder_R() {
     if (digitalRead(PIN_ENC_R_B) == LOW) {
         encoder_count_R--; // 注意：由于电机是对称安装的，左右轮的极性可能相反，后续联调时可能需要把 ++ 和 -- 互换
+        encoder_delta_R--;
     } else {
         encoder_count_R++;
+        encoder_delta_R++;
     }
 }
 
@@ -44,24 +50,27 @@ void Encoder_Init() {
 // [EN] Speed Readers (Atomic Access)
 // [CN] 速度读取函数 (包含原子级防撕裂保护)
 // --------------------------------------------------------
-int16_t Get_Encoder_Speed_L() {
-    int16_t speed;
+int32_t Get_Encoder_Speed_L() {
+    int32_t speed;
 
     // [CN] 强行关闭全局中断。防止在我们复制 32 位数据的中途，突然来了一个脉冲把数据改了，导致数据撕裂
     // [EN] Critical Section: Disable interrupts to prevent data tearing when reading 32-bit encoder count
     noInterrupts(); 
-    speed = encoder_count_L; // 提取速度 (5ms 内积累的脉冲数)
-    encoder_count_L = 0;     // 计数器清零，为下一个 5ms 周期做准备
+    speed = encoder_delta_L; // 提取速度 (5ms 内积累的脉冲数)
+    speed = speed * 200; // 将 5ms 内的脉冲数换算为每秒的脉冲数 (200 = 1000ms / 5ms)
+    encoder_delta_L = 0;     // 计数器清零，为下一个 5ms 周期做准备
     interrupts();            // 恢复全局中断
     
     return speed;
 }
 
-int16_t Get_Encoder_Speed_R() {
-    int16_t speed;
+int32_t Get_Encoder_Speed_R() {
+    int32_t speed;
+    
     noInterrupts(); 
-    speed = encoder_count_R;
-    encoder_count_R = 0;
+    speed = encoder_delta_R;
+    speed = speed * 200; // 将 5ms 内的脉冲数换算为每秒的脉冲数 (200 = 1000ms / 5ms)
+    encoder_delta_R = 0;
     interrupts();
     return speed;
 }

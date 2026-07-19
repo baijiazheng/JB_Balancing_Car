@@ -29,8 +29,10 @@ void setup() {
             MPU6050_Read_RAW();
             MPU6050_Calculate_Angle(0.005);
 
-            // int16_t speed_left = Get_Encoder_Speed_L();
-            // int16_t speed_right = Get_Encoder_Speed_R();
+            int32_t speed_left = Get_Encoder_Speed_L();
+            int32_t speed_right = Get_Encoder_Speed_R();
+            // int32_t encoder_count_L = Get_Encoder_Count_L();
+            // int32_t encoder_count_R = Get_Encoder_Count_R();
 
             // 2. [EN] Control: Standard PD calculation
             // 2. [CN] 控制层：标准的直立 PD 计算
@@ -42,13 +44,11 @@ void setup() {
                 Set_Motor(0, 0);
                 return; 
             }
-            //Set_Motor(-motor_out, -motor_out);
+            Set_Motor(400, 400);
 
             // ================= 3. 降频遥测层 (时间片切分) =================
             //Telemetry_Send_100ms(pitchAngle, gyroRateX);
-            int32_t encoder_count_L = Get_Encoder_Count_L();
-            int32_t encoder_count_R = Get_Encoder_Count_R();
-            Telemetry_Send_100ms(encoder_count_L, encoder_count_R);
+            Telemetry_Send_100ms(speed_left, speed_right);
         }
 
     // ================= 空闲时间：处理接收指令 =================
