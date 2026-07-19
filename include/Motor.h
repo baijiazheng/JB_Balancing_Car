@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define Motor_MAX_PWM 255 // [EN] Maximum PWM value for motor control / [CH] 电机控制的最大 PWM 值
+#define Motor_MAX_PWM 100 // [EN] Maximum PWM value for motor control / [CH] 电机控制的最大 PWM 值
 
 // [EN] Define whether the PWM signal is active low or active high
 // [CH] 定义 PWM 信号是低电平有效还是高电平有效
@@ -11,7 +11,7 @@ constexpr bool PWM_ACTIVE_LOW = true;
 
 // [EN] Write PWM value to motor pin, considering active low/high configuration
 // [CH] 向电机引脚写入 PWM 值，考虑高低电平配置
-static inline void Motor_WritePWM(uint8_t pin, uint8_t duty);
+void Motor_WritePWM(uint8_t pin, uint8_t duty);
 
 // [EN] Set Motor speeds 
 // [CN] 设置电机速度，正数正转，负数反转，0为刹车

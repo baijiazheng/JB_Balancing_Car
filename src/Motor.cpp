@@ -3,7 +3,7 @@
 
 // [EN] Write PWM value to motor pin, considering active low/high configuration
 // [CN] 向电机引脚写入 PWM 值，考虑高低电平配置
-static inline void Motor_WritePWM(uint8_t pin, uint8_t duty)
+void Motor_WritePWM(uint8_t pin, uint8_t duty)
 {
     if (PWM_ACTIVE_LOW)
         analogWrite(pin, 255 - duty);

@@ -57,7 +57,6 @@ int32_t Get_Encoder_Speed_L() {
     // [EN] Critical Section: Disable interrupts to prevent data tearing when reading 32-bit encoder count
     noInterrupts(); 
     speed = encoder_delta_L; // 提取速度 (5ms 内积累的脉冲数)
-    speed = speed * 200; // 将 5ms 内的脉冲数换算为每秒的脉冲数 (200 = 1000ms / 5ms)
     encoder_delta_L = 0;     // 计数器清零，为下一个 5ms 周期做准备
     interrupts();            // 恢复全局中断
     
@@ -69,7 +68,6 @@ int32_t Get_Encoder_Speed_R() {
     
     noInterrupts(); 
     speed = encoder_delta_R;
-    speed = speed * 200; // 将 5ms 内的脉冲数换算为每秒的脉冲数 (200 = 1000ms / 5ms)
     encoder_delta_R = 0;
     interrupts();
     return speed;
