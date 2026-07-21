@@ -40,14 +40,7 @@ void setup() {
 
             // 3. [EN] Actuation: Output to motors
             // 3. [CN] 执行层：输出到电机
-            if (abs(pitchAngle) > 45.0) {
-                Set_Motor(0, 0);
-                return; 
-            }
-            if(abs(motor_out)<20){
-                motor_out=0;
-            }
-            Set_Motor(motor_out, motor_out);
+            Drive_Motor(pitchAngle, motor_out);
 
             // ================= 3. 降频遥测层 (时间片切分) =================
             //Telemetry_Send_100ms(pitchAngle, gyroRateX);

@@ -66,3 +66,35 @@ void Motor_Diagnostic_Test() {
     delay(300);
     Set_Motor(0,0);
 }
+
+int16_t Motor_Output_Filter(int16_t &target_PWM,float pitchAngle) {
+    int16_t limit = 0; // [EN] Define the maximum change per 5ms / [CN] 定义每5ms的最大变化量
+    static int16_t previous_output_PWM = 0; // [EN] Store the previous speed / [CN] 存储上一次的速度值
+    
+    if(abs(pitchAngle) < 15.0) {
+        limit = 1; // [EN] If the angle is small, allow a smaller change / [CN] 如果角度小，允许较小的变化量
+        if (abs(target_PWM - previous_output_PWM) > limit) {
+            if (target_PWM > previous_output_PWM) {
+                previous_output_PWM += limit;
+            } else {
+                previous_output_PWM -= limit;
+            }
+        } else {
+            previous_output_PWM = target_PWM;
+        }
+        return previous_output_PWM;
+    } else {
+        return target_PWM; // [EN] If the angle is large, no filtering / [CN] 如果角度大，不进行滤波
+    }
+}
+
+void Drive_Motor(float pitchAngle,int16_t motor_out) {
+    if (abs(pitchAngle) > 45.0) {
+        Set_Motor(0, 0);
+        return; 
+    }
+    if(abs(motor_out)<10){
+        motor_out=0;
+    }
+    Set_Motor(Motor_Output_Filter(motor_out,pitchAngle), Motor_Output_Filter(motor_out,pitchAngle));
+}

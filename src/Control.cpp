@@ -1,9 +1,10 @@
 #include "Control.h"
 #include "Motor.h"
+
 // [EN] Initialize parameters (These values need to be tuned on the real hardware)
 // [CN] 初始化参数 (这些极性及具体数值，必须在真机上一点点调出来)
-float Kp_Upright = 30;  // 比例系数 (力度)
-float Kd_Upright = 1.5;   // 微分系数 (阻尼)
+float Kp_Upright = 10;  // 比例系数 (力度)
+float Kd_Upright = 1.0;   // 微分系数 (阻尼)
 float Target_Angle = 2.0; // 假设重心零点是 2.0 度
 
 // [EN] Upright PD Control Implementation
