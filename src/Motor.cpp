@@ -90,7 +90,21 @@ int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
             previous_output_PWM = target_PWM;
         }
         return previous_output_PWM;
-    } else {
+    }
+    else if(previous_output_PWM * target_PWM < 0) { // [EN] If the direction changes, allow a larger change / [CN] 如果方向改变，允许较大的变化量
+        limit = 10; // [EN] If the angle is moderate, allow a larger change / [CN] 如果角度适中，允许较大的变化量
+        if (abs(target_PWM - previous_output_PWM) > limit) {
+            if (target_PWM > previous_output_PWM) {
+                previous_output_PWM += limit;
+            } else {
+                previous_output_PWM -= limit;
+            }
+        } else {
+            previous_output_PWM = target_PWM;
+        }
+        return previous_output_PWM;
+    } 
+    else {
         previous_output_PWM = 0; // [EN] Reset previous output when angle is large / [CN] 当角度大时，重置上一次输出
         return target_PWM; // [EN] If the angle is large, no filtering / [CN] 如果角度大，不进行滤波
     }
@@ -99,6 +113,6 @@ int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
 
 void Drive_Motor(float pitchAngle,int16_t motor_out) {
     int16_t filtered_PWM = Motor_Output_Filter(motor_out, pitchAngle);
-    
+
     Set_Motor(filtered_PWM, filtered_PWM);
 }
