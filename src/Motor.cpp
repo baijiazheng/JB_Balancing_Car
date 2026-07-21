@@ -67,7 +67,7 @@ void Motor_Diagnostic_Test() {
     Set_Motor(0,0);
 }
 
-int16_t Motor_Output_Filter(int16_t &target_PWM,float pitchAngle) {
+int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
     int16_t limit = 0; // [EN] Define the maximum change per 5ms / [CN] 定义每5ms的最大变化量
     static int16_t previous_output_PWM = 0; // [EN] Store the previous speed / [CN] 存储上一次的速度值
     
@@ -96,5 +96,6 @@ void Drive_Motor(float pitchAngle,int16_t motor_out) {
     if(abs(motor_out)<10){
         motor_out=0;
     }
-    Set_Motor(Motor_Output_Filter(motor_out,pitchAngle), Motor_Output_Filter(motor_out,pitchAngle));
+    int16_t filtered_PWM = Motor_Output_Filter(motor_out, pitchAngle);
+    Set_Motor(filtered_PWM, filtered_PWM);
 }

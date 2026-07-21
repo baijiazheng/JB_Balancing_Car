@@ -23,7 +23,7 @@ void Motor_Diagnostic_Test() ;
 
 // [EN] Filter the motor output to prevent sudden changes
 // [CN] 对电机输出进行滤波，防止突变
-int16_t Motor_Output_Filter(int16_t &target_PWM,float pitchAngle);
+int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle);
 
 // [EN] Drive the motor based on the filtered output
 // [CN] 根据滤波后的输出驱动电机
