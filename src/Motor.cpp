@@ -74,7 +74,7 @@ int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
     if (abs(pitchAngle) > 45.0) {
         return previous_output_PWM=0; // [EN] If the angle is too large, stop the motors / [CN] 如果角度过大，停止电机
     }
-    if(abs(target_PWM)<10){
+    if(abs(target_PWM)<20){
         target_PWM=0;
     }
 
