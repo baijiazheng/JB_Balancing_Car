@@ -1,12 +1,17 @@
 #include "HW_CONFIG.h"
 #include "Encoder.h"
+#include "Bluetooth.h"
 
 volatile int32_t encoder_count_L = 0;
 volatile int32_t encoder_count_R = 0;
 volatile int32_t encoder_delta_L = 0;
 volatile int32_t encoder_delta_R = 0;
-volatile int32_t count_L = 0;
-volatile int32_t count_R = 0;
+volatile int32_t encoder_position_L = 0;
+volatile int32_t encoder_position_R = 0;
+// [EN] Static counter hidden from global scope (Encapsulation)
+// [CN] 隐藏在局部作用域的静态计数器，实现面向对象级别的封装，防止被外部意外篡改
+static uint8_t speed_counter = 0;
+int32_t speed_car = 0; // [EN] Average speed of the car / [CN] 小车的平均速度
 
 // --------------------------------------------------------
 // [EN] Interrupt Service Routines (ISR)
@@ -56,8 +61,9 @@ int32_t Get_Encoder_Speed_L() {
     // [CN] 强行关闭全局中断。防止在我们复制 32 位数据的中途，突然来了一个脉冲把数据改了，导致数据撕裂
     // [EN] Critical Section: Disable interrupts to prevent data tearing when reading 32-bit encoder count
     noInterrupts(); 
-    speed = encoder_delta_L; // 提取速度 (5ms 内积累的脉冲数)
-    encoder_delta_L = 0;     // 计数器清零，为下一个 5ms 周期做准备
+    speed = encoder_delta_L; // 提取速度 (积累的脉冲数)
+    speed *= ENC_Hz; // 转换为每秒脉冲数 (Hz)
+    encoder_delta_L = 0;     // 计数器清零，为下一个周期做准备
     interrupts();            // 恢复全局中断
     
     return speed;
@@ -68,25 +74,38 @@ int32_t Get_Encoder_Speed_R() {
     
     noInterrupts(); 
     speed = encoder_delta_R;
+    speed *= ENC_Hz; 
     encoder_delta_R = 0;
     interrupts();
     return speed;
 }
 
-int32_t Get_Encoder_Count_L() {
-    
-    noInterrupts(); 
-    count_L += encoder_count_L;
-    encoder_count_L = 0; // Clear the encoder count after reading
-    interrupts();
-    return count_L;
+void Get_Speed (){
+    speed_counter++;
+    int16_t speed_counter_limit = (200 / ENC_Hz); // [EN] Calculate speed every 50ms / [CN] 每50ms计算一次速度
+    if (speed_counter >= speed_counter_limit) {
+        speed_counter = 0; 
+        int32_t speed_L = Get_Encoder_Speed_L();
+        int32_t speed_R = Get_Encoder_Speed_R();
+        speed_car = (speed_L + speed_R) / 2; 
+        BT_SERIAL.println(speed_car);
+    }
 }
 
-int32_t Get_Encoder_Count_R() {
+int32_t Get_Encoder_Position_L() {
+    
+    noInterrupts(); 
+    encoder_position_L += encoder_count_L;
+    encoder_count_L = 0; // Clear the encoder count after reading
+    interrupts();
+    return encoder_position_L;
+}
+
+int32_t Get_Encoder_Position_R() {
 
     noInterrupts(); 
-    count_R += encoder_count_R;
+    encoder_position_R += encoder_count_R;
     encoder_count_R = 0; // Clear the encoder count after reading
     interrupts();
-    return count_R;
+    return encoder_position_R;
 }

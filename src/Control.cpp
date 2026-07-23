@@ -1,5 +1,6 @@
 #include "Control.h"
 #include "Motor.h"
+#include "Encoder.h"
 
 // [EN] Initialize parameters (These values need to be tuned on the real hardware)
 // [CN] 初始化参数 (这些极性及具体数值，必须在真机上一点点调出来)
@@ -30,3 +31,51 @@ int16_t Upright_PD_Control(float pitch, float gyro_rate) {
 
     return (int16_t)final_pwm ;
 }
+
+int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
+    int16_t limit = 0; // [EN] Define the maximum change per 5ms / [CN] 定义每5ms的最大变化量
+    static int16_t previous_output_PWM = 0; // [EN] Store the previous speed / [CN] 存储上一次的速度值
+    
+    if (abs(pitchAngle) > 45.0) {
+        return previous_output_PWM=0; // [EN] If the angle is too large, stop the motors / [CN] 如果角度过大，停止电机
+    }
+    if(abs(target_PWM)<20){
+        target_PWM=0;
+    }
+
+    if(abs(pitchAngle) < 15.0) {
+        limit = 1; // [EN] If the angle is small, allow a smaller change / [CN] 如果角度小，允许较小的变化量
+        if (abs(target_PWM - previous_output_PWM) > limit) {
+            if (target_PWM > previous_output_PWM) {
+                previous_output_PWM += limit;
+            } else {
+                previous_output_PWM -= limit;
+            }
+        } else {
+            previous_output_PWM = target_PWM;
+        }
+        return previous_output_PWM;
+    }
+    else if(previous_output_PWM * target_PWM < 0) { // [EN] If the direction changes, allow a larger change / [CN] 如果方向改变，允许较大的变化量
+        limit = 10; // [EN] If the angle is moderate, allow a larger change / [CN] 如果角度适中，允许较大的变化量
+        if (abs(target_PWM - previous_output_PWM) > limit) {
+            if (target_PWM > previous_output_PWM) {
+                previous_output_PWM += limit;
+            } else {
+                previous_output_PWM -= limit;
+            }
+        } else {
+            previous_output_PWM = target_PWM;
+        }
+        return previous_output_PWM;
+    } 
+    else {
+        previous_output_PWM = 0; // [EN] Reset previous output when angle is large / [CN] 当角度大时，重置上一次输出
+        return target_PWM; // [EN] If the angle is large, no filtering / [CN] 如果角度大，不进行滤波
+    }
+
+}
+
+//---velocity loop filter---
+
+    

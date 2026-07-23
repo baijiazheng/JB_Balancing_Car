@@ -19,4 +19,8 @@ extern float Target_Angle;
 // 参数 pitch: 当前融合倾角 | 参数 gyro_rate: 当前陀螺仪角速度
 int16_t Upright_PD_Control(float pitch, float gyro_rate);
 
+// [EN] Filter the motor output to prevent sudden changes(Adaptive PWM Slew Rate Limiter)
+// [CN] 对电机输出进行滤波，防止突变(自适应 PWM 变化率限制器)
+int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle);
+
 #endif // CONTROL_H
