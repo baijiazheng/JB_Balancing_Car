@@ -50,24 +50,6 @@ void Set_Motor(int32_t speed_L, int32_t speed_R) {
     }
 }
 
-// [EN] Motor Diagnostic Sweep Routine
-// [CN] 电机扫频压测函数 (开机执行一次)
-void Motor_Diagnostic_Test() {
-    Set_Motor(100, 0);
-    delay(300);
-    Set_Motor(0,100);
-    delay(300);
-    Set_Motor(-100, 0);
-    delay(300);
-    Set_Motor(0,-100);
-    delay(300);
-    Set_Motor(100, 100);
-    delay(300);
-    Set_Motor(-100, -100);
-    delay(300);
-    Set_Motor(0,0);
-}
-
 void Drive_Motor(float pitchAngle,int16_t motor_out) {
     int16_t filtered_PWM = Motor_Output_Filter(motor_out, pitchAngle);
 
