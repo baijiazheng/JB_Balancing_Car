@@ -6,8 +6,8 @@ volatile int32_t encoder_count_L = 0;
 volatile int32_t encoder_count_R = 0;
 volatile int32_t encoder_delta_L = 0;
 volatile int32_t encoder_delta_R = 0;
-volatile int32_t encoder_position_L = 0;
-volatile int32_t encoder_position_R = 0;
+volatile int32_t encoder_tick_L = 0;
+volatile int32_t encoder_tick_R = 0;
 // [EN] Static counter hidden from global scope (Encapsulation)
 // [CN] 隐藏在局部作用域的静态计数器，实现面向对象级别的封装，防止被外部意外篡改
 static uint8_t speed_counter = 0;
@@ -92,20 +92,20 @@ void Get_Speed (){
     }
 }
 
-int32_t Get_Encoder_Position_L() {
+int32_t Get_Encoder_Tick_L() {
     
     noInterrupts(); 
-    encoder_position_L += encoder_count_L;
+    encoder_tick_L += encoder_count_L;
     encoder_count_L = 0; // Clear the encoder count after reading
     interrupts();
-    return encoder_position_L;
+    return encoder_tick_L;
 }
 
-int32_t Get_Encoder_Position_R() {
+int32_t Get_Encoder_Tick_R() {
 
     noInterrupts(); 
-    encoder_position_R += encoder_count_R;
+    encoder_tick_R += encoder_count_R;
     encoder_count_R = 0; // Clear the encoder count after reading
     interrupts();
-    return encoder_position_R;
+    return encoder_tick_R;
 }

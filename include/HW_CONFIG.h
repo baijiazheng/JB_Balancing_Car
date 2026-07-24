@@ -2,6 +2,15 @@
 #define HW_CONFIG_H
 
 #include <Arduino.h>
+
+// ==========================================
+// [EN] 0. Hardware Configuration Constants
+// [CN] 0. 硬件配置常量
+// ==========================================
+#define MOTOR_ENCODER_PPR 11
+#define GEAR_RATIO 10
+#define WHEEL_ENCODER_COUNT 110
+
 // ==========================================
 // [EN] 1. Pin Mapping (Physical to Logical)
 // [CN] 1. 引脚映射 (物理引脚 -> 逻辑名称)

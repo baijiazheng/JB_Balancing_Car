@@ -17,8 +17,8 @@ int32_t Get_Encoder_Speed_R();
     
 // [EN] Get the total accumulated pulse count since system start (does not clear counter)
 // [CN] 获取自系统启动以来的总脉冲数 (不会清零)
-int32_t Get_Encoder_Position_L();
-int32_t Get_Encoder_Position_R();
+int32_t Get_Encoder_Tick_L();
+int32_t Get_Encoder_Tick_R();
 
 // [EN] Initialize external interrupts for encoders
 // [CN] 初始化编码器外部中断

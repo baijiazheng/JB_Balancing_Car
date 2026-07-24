@@ -36,11 +36,11 @@ void Balance_Mode_Loop() {
 
         // 2. [EN] Control: Standard PD calculation
         // 2. [CN] 控制层：标准的直立 PD 计算
-        //int16_t motor_out = Upright_PD_Control(pitchAngle, gyroRateX);
+        int16_t motor_out = Upright_PD_Control(pitchAngle, gyroRateX);
 
         // 3. [EN] Actuation: Output to motors
         // 3. [CN] 执行层：输出到电机
-        //Drive_Motor(pitchAngle, motor_out);
+        Drive_Motor(pitchAngle, motor_out);
 
         // ================= 3. 降频遥测层 (时间片切分) =================
         //Telemetry_Send_100ms(pitchAngle, gyroRateX);

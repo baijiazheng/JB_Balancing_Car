@@ -9,6 +9,8 @@
 #include "System_Mode.h"
 #include "Balance_Mode.h"
 #include "Encoder_Test.h"
+#include "Motor_Test.h"
+#include "Bluetooth_Config.h"
 
 // ================= 主系统入口 =================
 void setup() {
