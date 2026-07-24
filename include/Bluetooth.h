@@ -30,8 +30,4 @@ void Telemetry_Send_100ms(float pitch, float gyro_rate);
 // [CN] 检查并解析手机端发来的遥控指令
 char Telemetry_Receive_Cmd();
 
-// [EN] Configure Bluetooth module (Optional, can be left empty)
-// [CN] 配置蓝牙模块 (可选，留空即可)
-void Telemetry_CONFIG();
-
 #endif // Bluetooth_H

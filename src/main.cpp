@@ -18,6 +18,8 @@ void setup() {
     Encoder_Test_Init();
     #elif SYSTEM_MODE == 3
     Motor_Test_Init();
+    #elif SYSTEM_MODE == 4
+    Telemetry_CONFIG(); 
     #endif
 }
 
