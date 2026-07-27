@@ -19,50 +19,67 @@ int32_t speed_car = 0; // [EN] Average speed of the car / [CN] 小车的平均�
 volatile int32_t Isr_L_count = 0;
 volatile int32_t Isr_R_count = 0;
 
-// --------------------------------------------------------
-// [EN] Interrupt Service Routines (ISR)
-// [CN] 中断服务函数：越短越好，绝对不能有 delay 或 Serial.print
-// --------------------------------------------------------
-void ISR_Encoder_L() {
-    ++Isr_L_count;
-    // 当 A 相发生上升沿时，读取 B 相的电平来判断方向
-    if((PINA & (1 << PA0)) == 0) { // [EN] If B phase is low, the wheel is moving forward / [CN] 如果 B 相为低电平，说明轮子在正向转动
-        encoder_count_L++;
-        encoder_delta_L++;
-        B_LOW_L_count++;
-    } else {
-        encoder_count_L--;
-        encoder_delta_L--;
-        B_HIGH_L_count++;
-    }
-}
+volatile uint32_t last_interrupt_time_L = 0;
+volatile uint32_t last_interrupt_time_R = 0;
 
-void ISR_Encoder_R() {
-    ++Isr_R_count;
-
-    if((PINA & (1 << PA1)) == 0) {
-        encoder_count_R--; // 注意：由于电机是对称安装的，左右轮的极性可能相反，后续联调时可能需要把 ++ 和 -- 互换
-        encoder_delta_R--;
-        B_LOW_R_count++;
-    } else {
-        encoder_count_R++;
-        encoder_delta_R++;
-        B_HIGH_R_count++;
-    }
-}
-
-// --------------------------------------------------------
-// [EN] Initialization
-// [CN] 中断初始化
-// --------------------------------------------------------
-void Encoder_Init() {
-    // 确保在 hw_config.cpp 中，引脚已经被配置为 INPUT_PULLUP
+// // --------------------------------------------------------
+// // [EN] Interrupt Service Routines (ISR)
+// // [CN] 中断服务函数：越短越好，绝对不能有 delay 或 Serial.print
+// // --------------------------------------------------------
+// void ISR_Encoder_L() {
+//     ++Isr_L_count;
     
-    // 绑定外部中断：指定引脚，指定中断服务函数，指定触发条件 (RISING = 上升沿触发)
-    // 必须使用 digitalPinToInterrupt 将物理引脚号转为底层中断号
-    attachInterrupt(digitalPinToInterrupt(PIN_ENC_L_A), ISR_Encoder_L, RISING);
-    attachInterrupt(digitalPinToInterrupt(PIN_ENC_R_A), ISR_Encoder_R, RISING);
-}
+//     if((digitalRead(PIN_ENC_L_A) == HIGH)){
+//         // 当 A 相发生上升沿时，读取 B 相的电平来判断方向
+//         if((PINA & (1 << PA0)) == 0) { // [EN] If B phase is low, the wheel is moving forward / [CN] 如果 B 相为低电平，说明轮子在正向转动
+//             encoder_count_L++;
+//             encoder_delta_L++;
+//             B_LOW_L_count++;
+//         } else {
+//             encoder_count_L--;
+//             encoder_delta_L--;
+//             B_HIGH_L_count++;
+//         }
+//     }
+// }
+
+// void ISR_Encoder_R() {
+//     // 1. 滤除 A 相自身的极窄干扰毛刺
+//     // 刚触发中断，立刻再读一次 A 相。如果是 PWM 产生的百纳秒级毛刺，此时它已经回落为 LOW 了
+//     if (digitalRead(PIN_ENC_R_A) == LOW) {
+//         return; // 假中断，直接丢弃！
+//     }
+
+//     // 2. 软件延时微秒级防抖 (避开 PWM 振铃期)
+//     delayMicroseconds(2);
+
+//     ++Isr_R_count;
+
+//     if (digitalRead(PIN_ENC_R_A) == HIGH){
+//         if((PINA & (1 << PA1)) == 0) {
+//             encoder_count_R--; // 注意：由于电机是对称安装的，左右轮的极性可能相反，后续联调时可能需要把 ++ 和 -- 互换
+//             encoder_delta_R--;
+//             B_LOW_R_count++;
+//         } else {
+//             encoder_count_R++;
+//             encoder_delta_R++;
+//             B_HIGH_R_count++;
+//         }
+//     }
+// }
+
+// // --------------------------------------------------------
+// // [EN] Initialization
+// // [CN] 中断初始化
+// // --------------------------------------------------------
+// void Encoder_Init() {
+//     // 确保在 hw_config.cpp 中，引脚已经被配置为 INPUT_PULLUP
+    
+//     // 绑定外部中断：指定引脚，指定中断服务函数，指定触发条件 (RISING = 上升沿触发)
+//     // 必须使用 digitalPinToInterrupt 将物理引脚号转为底层中断号
+//     attachInterrupt(digitalPinToInterrupt(PIN_ENC_L_A), ISR_Encoder_L, RISING);
+//     attachInterrupt(digitalPinToInterrupt(PIN_ENC_R_A), ISR_Encoder_R, RISING);
+// }
 
 // --------------------------------------------------------
 // [EN] Speed Readers (Atomic Access)
