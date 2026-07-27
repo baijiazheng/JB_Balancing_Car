@@ -7,6 +7,8 @@
 #include <Arduino.h>
 
 #define ENC_Hz 20 // [EN] Encoder reading frequency (Hz) / [CN] 编码器读取频率 (Hz)
+#define ENCODER_LEFT_DIRECTION  1 // [EN] Direction of the left encoder (1 for normal, -1 for reversed) / [CN] 左编码器的方向 (1 为正常，-1 为反向)
+#define ENCODER_RIGHT_DIRECTION -1 // [EN] Direction of the right encoder (1 for normal, -1 for reversed) / [CN] 右编码器的方向 (1 为正常，-1 为反向)
 
 extern int32_t speed_car; // [EN] Average speed of the car / [CN] 小车的平均速度
 
@@ -19,6 +21,18 @@ int32_t Get_Encoder_Speed_R();
 // [CN] 获取自系统启动以来的总脉冲数 (不会清零)
 int32_t Get_Encoder_Tick_L();
 int32_t Get_Encoder_Tick_R();
+
+// [EN] Get the number of interrupts that have occurred for each encoder
+// [CN] 获取每个编码器发生的中断次数
+uint32_t Get_ISR_Count_L();
+uint32_t Get_ISR_Count_R();
+
+// [EN] Get the number of high and low states for each encoder's B phase
+// [CN] 获取每个编码器 B 相的高电平和低电平状态次数
+uint32_t Get_B_HIGH_L_Count();
+uint32_t Get_B_LOW_L_Count();
+uint32_t Get_B_HIGH_R_Count();
+uint32_t Get_B_LOW_R_Count();
 
 // [EN] Initialize external interrupts for encoders
 // [CN] 初始化编码器外部中断

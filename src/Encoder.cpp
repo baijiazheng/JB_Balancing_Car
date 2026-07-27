@@ -8,33 +8,46 @@ volatile int32_t encoder_delta_L = 0;
 volatile int32_t encoder_delta_R = 0;
 volatile int32_t encoder_tick_L = 0;
 volatile int32_t encoder_tick_R = 0;
+volatile int32_t B_HIGH_L_count = 0;
+volatile int32_t B_LOW_L_count = 0;
+volatile int32_t B_HIGH_R_count = 0;
+volatile int32_t B_LOW_R_count = 0;
 // [EN] Static counter hidden from global scope (Encapsulation)
 // [CN] 隐藏在局部作用域的静态计数器，实现面向对象级别的封装，防止被外部意外篡改
 static uint8_t speed_counter = 0;
 int32_t speed_car = 0; // [EN] Average speed of the car / [CN] 小车的平均速度
+volatile int32_t Isr_L_count = 0;
+volatile int32_t Isr_R_count = 0;
 
 // --------------------------------------------------------
 // [EN] Interrupt Service Routines (ISR)
 // [CN] 中断服务函数：越短越好，绝对不能有 delay 或 Serial.print
 // --------------------------------------------------------
 void ISR_Encoder_L() {
+    ++Isr_L_count;
     // 当 A 相发生上升沿时，读取 B 相的电平来判断方向
-    if (digitalRead(PIN_ENC_L_B) == LOW) {
+    if((PINA & (1 << PA0)) == 0) { // [EN] If B phase is low, the wheel is moving forward / [CN] 如果 B 相为低电平，说明轮子在正向转动
         encoder_count_L++;
         encoder_delta_L++;
+        B_LOW_L_count++;
     } else {
         encoder_count_L--;
         encoder_delta_L--;
+        B_HIGH_L_count++;
     }
 }
 
 void ISR_Encoder_R() {
-    if (digitalRead(PIN_ENC_R_B) == LOW) {
+    ++Isr_R_count;
+
+    if((PINA & (1 << PA1)) == 0) {
         encoder_count_R--; // 注意：由于电机是对称安装的，左右轮的极性可能相反，后续联调时可能需要把 ++ 和 -- 互换
         encoder_delta_R--;
+        B_LOW_R_count++;
     } else {
         encoder_count_R++;
         encoder_delta_R++;
+        B_HIGH_R_count++;
     }
 }
 
@@ -65,7 +78,7 @@ int32_t Get_Encoder_Speed_L() {
     speed *= ENC_Hz; // 转换为每秒脉冲数 (Hz)
     encoder_delta_L = 0;     // 计数器清零，为下一个周期做准备
     interrupts();            // 恢复全局中断
-    
+    speed *= ENCODER_LEFT_DIRECTION; // 考虑编码器方向
     return speed;
 }
 
@@ -77,6 +90,7 @@ int32_t Get_Encoder_Speed_R() {
     speed *= ENC_Hz; 
     encoder_delta_R = 0;
     interrupts();
+    speed *= ENCODER_RIGHT_DIRECTION; // 考虑编码器方向
     return speed;
 }
 
@@ -108,4 +122,67 @@ int32_t Get_Encoder_Tick_R() {
     encoder_count_R = 0; // Clear the encoder count after reading
     interrupts();
     return encoder_tick_R;
+}
+
+uint32_t Get_ISR_Count_L(){
+
+    uint32_t temp;
+
+    noInterrupts();
+    temp = Isr_L_count;
+    interrupts();
+
+    return temp;
+}
+
+
+uint32_t Get_ISR_Count_R(){
+
+    uint32_t temp;
+
+    noInterrupts();
+    temp = Isr_R_count;
+    interrupts();
+
+    return temp;
+}
+
+uint32_t Get_B_HIGH_L_Count() {
+    uint32_t temp;
+
+    noInterrupts();
+    temp = B_HIGH_L_count;
+    interrupts();
+
+    return temp;
+}
+
+uint32_t Get_B_LOW_L_Count() {
+    uint32_t temp;
+
+    noInterrupts();
+    temp = B_LOW_L_count;
+    interrupts();
+
+    return temp;
+}
+
+uint32_t Get_B_HIGH_R_Count() {
+    uint32_t temp;
+
+    noInterrupts();
+    temp = B_HIGH_R_count;
+    interrupts();
+
+    return temp;
+}
+
+uint32_t Get_B_LOW_R_Count() {
+    uint32_t temp;
+
+    noInterrupts();
+    temp = B_LOW_R_count;
+    interrupts();
+
+    return temp;
 }
