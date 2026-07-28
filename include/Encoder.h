@@ -41,5 +41,6 @@ void Encoder_Init();
 // [EN] Get the average speed of the car (average of left and right wheel speeds)
 // [CN] 获取小车的平均速度 (左右轮速度的平均值)
 void Get_Speed();
+void Get_Timer_ENC();
 
 #endif

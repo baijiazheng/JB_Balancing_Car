@@ -10,7 +10,7 @@
 // 3: [EN] Motor Test                     [CN] 电机测试
 // 4: [EN] Bluetooth Baud Rate Adjustment [CN] 蓝牙波特率调节
 
-#define SYSTEM_MODE 2
+#define SYSTEM_MODE 1
 
 
 #endif // SYSTEM_MODE_H

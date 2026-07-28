@@ -6,7 +6,11 @@
 // [CN] 初始化参数 (这些极性及具体数值，必须在真机上一点点调出来)
 float Kp_Upright = 11;  // 比例系数 (力度)
 float Kd_Upright = 1.5;   // 微分系数 (阻尼)
-float Target_Angle = 8.8; // 假设重心零点是 8.8 度
+float Kp_velocity = -0.01;
+float Ki_velocity = 0;
+float Mec_Zero = 6.0;
+float Target_Angle = 6.0; // 假设重心零点
+float Target_Speed = 0;
 
 // [EN] Upright PD Control Implementation
 // [CN] 直立环 PD 控制实现
@@ -43,8 +47,8 @@ int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
         target_PWM=0;
     }
 
-    if(abs(pitchAngle) < 15.0) {
-        limit = 1; // [EN] If the angle is small, allow a smaller change / [CN] 如果角度小，允许较小的变化量
+    if(abs(pitchAngle-Target_Angle) < 15.0) {
+        limit = 2; // [EN] If the angle is small, allow a smaller change / [CN] 如果角度小，允许较小的变化量
         if (abs(target_PWM - previous_output_PWM) > limit) {
             if (target_PWM > previous_output_PWM) {
                 previous_output_PWM += limit;
@@ -57,7 +61,7 @@ int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
         return previous_output_PWM;
     }
     else if(previous_output_PWM * target_PWM < 0) { // [EN] If the direction changes, allow a larger change / [CN] 如果方向改变，允许较大的变化量
-        limit = 10; // [EN] If the angle is moderate, allow a larger change / [CN] 如果角度适中，允许较大的变化量
+        limit = 20; // [EN] If the angle is moderate, allow a larger change / [CN] 如果角度适中，允许较大的变化量
         if (abs(target_PWM - previous_output_PWM) > limit) {
             if (target_PWM > previous_output_PWM) {
                 previous_output_PWM += limit;
@@ -76,6 +80,40 @@ int16_t Motor_Output_Filter(int16_t target_PWM,float pitchAngle) {
 
 }
 
-//---velocity loop filter---
-
+// [EN] Velocity Loop PID (PI Control)
+// [CN] 速度外环 PI 控制算法
+void Get_Target_Angle (){
+    static int8_t counter = 0;
+    static float speed_error_sum = 0;
+    static int32_t last_speed_error = 0;
+    ++counter;
     
+    if (counter >= 3){
+        // 1. 计算当前速度偏差
+        int32_t speed_error = speed_car - Target_Speed;
+        
+        // 2. 速度平滑滤波（一阶低通滤波，消除编码器采样高频抖动）
+        // 0.7 和 0.3 为滤波系数，根据实际响应微调
+        float filtered_error = speed_error * 0.3f + last_speed_error * 0.7f;
+        last_speed_error = filtered_error;
+        
+        // 3. 累加积分 (I项)
+        speed_error_sum += filtered_error;
+        
+        // 4. 积分限幅 (Anti-Windup)，防止饱和发疯
+        speed_error_sum = constrain(speed_error_sum,-SPEED_I_LIMIT,SPEED_I_LIMIT);
+        
+        // 5. 计算速度环对角度的修正量
+        // 注意：这里的 Kp 和 Ki 必须非常小，因为输出量直接加到角度上！
+        float Angle_Offset = (filtered_error * Kp_velocity) + (speed_error_sum * Ki_velocity);
+        
+        // 6. 角度修正量限幅
+        Angle_Offset = constrain (Angle_Offset,-TARGET_ANGLE_LIMIT,TARGET_ANGLE_LIMIT);
+
+        // 7. 最终目标角度 = 机械零点 + 速度环输出的角度偏移量
+        Target_Angle = Mec_Zero + Angle_Offset;
+
+        counter = 0;
+    }
+
+}
